@@ -20,6 +20,7 @@ local _M = {
 -- common utils/constants
 local IS_64_BIT = ffi.abi('64bit')
 local ERANGE = 'Result too large'
+local int =  ffi.typeof("int")
 
 ffi.cdef([[
     char* strerror(int errnum);
@@ -945,10 +946,10 @@ if OS == 'Linux' then
         -- On arm64 stat and lstat do not exist as syscall, so use newfstatat instead
         -- int newfstatat(int dirfd, const char *filename, struct stat *statbuf, int flags)
         stat_func = function(filepath, buf)
-            return lib.syscall(79, STAT._AT_FDCWD, filepath, buf, 0)
+            return lib.syscall(79, int(STAT._AT_FDCWD), filepath, buf, 0)
         end
         lstat_func = function(filepath, buf)
-            return lib.syscall(79, STAT._AT_FDCWD, filepath, buf, STAT._AT_SYMLINK_NOFOLLOW)
+            return lib.syscall(79, int(STAT._AT_FDCWD), filepath, buf, int(STAT._AT_SYMLINK_NOFOLLOW))
         end
 
     elseif stat_syscall_num then
